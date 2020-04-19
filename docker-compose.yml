@@ -1,0 +1,45 @@
+version: '3'
+services:
+  db:
+    image: postgres:11.5-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: potato
+      POSTGRES_DB: GroFor
+      POSTGRES_USER: farmer
+    restart: always
+
+
+  backend:
+    build: ./backend
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=True
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app/backend
+    ports:
+      - "5000:5000"
+    stdin_open: true
+    tty: true
+    command: flask run --host=0.0.0.0
+    restart: always
+
+
+
+  # frontend:
+  #   build: ./frontend
+  #   volumes:
+  #     - ./frontend:/app/frontend
+  #     # One-way volume to use node_modules from inside image
+  #     - /app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - backend
+  #   command: npm start
