@@ -1,3 +1,5 @@
+CREATE TABLE public.version (version bigint DEFAULT 0);
+
 CREATE TABLE public.users
 (
     id SERIAL PRIMARY KEY,
@@ -16,6 +18,7 @@ CREATE TABLE public.users
     equipment_id INT,
     fertilizer TEXT,
     saleform TEXT,
+    role INT,
     UNIQUE(email)
 );
 
