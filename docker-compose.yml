@@ -5,6 +5,8 @@ services:
     container_name: smzhack_db_1
     ports:
       - '5432:5432'
+    volumes:
+      - ${PWD}/db_scripts:/root/scripts
     environment:
       POSTGRES_PASSWORD: potato
       POSTGRES_DB: GroFor
@@ -16,7 +18,7 @@ services:
     build: ./backend
     container_name: smzhack_backend_1
     environment:
-      - CONFIG_PATH=/backend/configure.ini
+      - CONFIG_PATH=configure.ini
       - FLASK_APP=main.py
       # для отладки (при запуске в релиз убрать!)
       - FLASK_DEBUG=1
