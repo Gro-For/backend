@@ -11,5 +11,5 @@ RUN pip3 install --upgrade pip -r requirements.txt
 # Add the rest of the code
 COPY . /app/backend
 
-# Make port 8000 available for the app
+# Make port 5000 available for the app
 EXPOSE 5000
