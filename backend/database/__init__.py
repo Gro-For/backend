@@ -68,7 +68,7 @@ class Database():
         except AttributeError:
             return "Подключение к БД разорвано"
         except psycopg2.errors.UniqueViolation:
-            return "Пользователь с таким никнеймом уже существует"
+            return "Пользователь с такой почтой уже существует"
 
         return True
 
@@ -99,7 +99,7 @@ class Database():
 
         # Формирование структуры для подстановке к запросу
         values = {
-            "field": sql.SQL(",").join(sql.Identifier(i) for i in ["id", "password"]),
+            "field": sql.SQL(",").join(sql.Identifier(i) for i in ["id", "password", "role"]),
             "table": sql.Identifier("public", "users"),
             "condition": sql.SQL(" and ").join(cond for cond in condition)
         }

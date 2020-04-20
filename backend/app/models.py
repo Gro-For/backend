@@ -19,6 +19,7 @@ PERMISSION_AUTHORIZATION = {
     # 1 - Farmer
     # 2 - User
     "api": [0, 1, 2],
+    "logout": [0, 1, 2]
 }
 
 
@@ -39,7 +40,7 @@ def check_auth(headers, name):
 
 class User ():
     __id = None
-    __username = None
+    __email = None
     __role = None
     __last_login = None
     __user_token = None
@@ -50,8 +51,8 @@ class User ():
         self.__id = id
 
     @classmethod
-    def set_username(self, name):
-        self.__username = name
+    def set_email(self, email):
+        self.__email = email
 
     @classmethod
     def set_role(self, role_):
@@ -66,8 +67,8 @@ class User ():
         return self.__last_login
 
     @classmethod
-    def get_username(self):
-        return self.__username
+    def get_email(self):
+        return self.__email
 
     @classmethod
     def get_id(self):

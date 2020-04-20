@@ -14,10 +14,8 @@ registration_bp = Blueprint('registration', __name__)
 def registration():
     """Registration new user Page"""
 
-    user = check_auth(request.headers, __name__)
-    if user != True:
-        return user
-    user = authorize.get(request.headers.get('UserToken'))
+    if request.headers.get('Token') != str(config['FLASK_APP']['SECRET_KEY']):
+        return jsonify({'message': 'Не верный токен'}), 401, {'ContentType': 'application/json'}
 
     vozvrat = {}
     try:
@@ -35,7 +33,8 @@ def registration():
             "firstname": file["firstname"] if file["firstname"] else None,
             "lastname": file["lastname"] if file["lastname"] else None,
             "patronymic": file["patronymic"] if file["patronymic"] else None,
-            "number_phone": file["number_phone"] if file["number_phone"] else None
+            "number_phone": file["number_phone"] if file["number_phone"] else None,
+            "role": 2
         }
         # Проверка введённых данных
         valid = valid_data(user)
@@ -82,16 +81,16 @@ def valid_data(user):
     valid = valid_password(user['password'], user['confirm_password'])
     if valid != True:
         return valid
-    valid = valid_email(user['email'], user['password'])
+    valid = valid_email(user['email'])
     if valid != True:
         return valid
     return True
 
 
-def valid_email(username, password):
-    """Checking username"""
+def valid_email(email):
+    """Checking email"""
     if re.search(
-            "^[A-Z]{1,20}[a-z\@\.]{1,20}[\d]{0,20}[^\s\.\,\:\;\!\?\(\)\"\'\-\–]{1,20}$", username) == None:
+            "[A-Z]{1,20}[a-z]{1,20}[\d]{0,20}[\.\-\@]{1,20}", email) == None:
         return "Почта не удовлетворяет требованиям"
     return True
 

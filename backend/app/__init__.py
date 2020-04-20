@@ -1,16 +1,17 @@
+import os
+
 from flask import Flask
 from flask_wtf.csrf import CsrfProtect, CSRFError
 from flask_sslify import SSLify
 from flask_cors import CORS
 
 from app.router import routers, csrf_exempt
-from app.models import config_init
+from app.models import config_init, config
 
 app = Flask(__name__)
+csrf = CsrfProtect(app)
 sslify = SSLify(app)
 CORS(app)
-
-config_init('configure.ini')
 
 routers(app)
 csrf_exempt(csrf)
@@ -31,8 +32,9 @@ def shutdown_server():
 
 
 path = os.environ.get('CONFIG_PATH') if os.environ.get(
-    'CONFIG_PATH') != None else "/flask_app/settings.ini"
-init_config(path)
+    'CONFIG_PATH') != None else "configure.ini"
+
+config_init(path)
 try:
     #   Flask application configuration
     app.config.update(dict(
