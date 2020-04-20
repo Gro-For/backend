@@ -1,0 +1,32 @@
+import re
+import configparser
+
+from flask import Blueprint, request, make_response, jsonify
+from werkzeug.security import check_password_hash
+
+from app.models import User, authorize, config
+from database import Database
+
+auth_bp = Blueprint('auth', __name__)
+
+
+@auth_bp.route('/auth', methods=['POST'])
+def auth_api():
+    if request.headers.get('Token') != str(config['FLASK_APP']['SECRET_KEY']):
+        return jsonify({'message': 'Не верный токен'}), 401, {'ContentType': 'application/json'}
+    try:
+        database = Database(config)
+    except TypeError:
+        return jsonify({"message": "Нет подключения к БД"})
+    username = request.get_json(silent=True).get("username")
+    password = request.get_json(silent=True).get("password")
+    user_data = database.login({"username": username})
+    if user_data:
+        if check_password_hash(user_data[1], password):
+            user = User()
+            user.set_user_id(user_data[0])
+            user.set_role(user_data[2])
+            user.set_username(username)
+            user.auth(user)
+            return jsonify({"UserToken": user.get_token(), "role": user.get_role()})
+    return jsonify({'message': 'Invalid username or password'}), 401, {'ContentType': 'application/json'}
