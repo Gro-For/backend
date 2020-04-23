@@ -26,16 +26,30 @@ def registration():
 
     file = request.get_json(silent=True)
     if file != None and request.method == "POST":
+        is_farmer = file["farmer"] if file["farmer"] else False
         user = {
-            "email": file["email"] if file["email"] else None,
-            "password": file["password"] if file["password"] else None,
-            "confirm_password": file["confirm_password"] if file["confirm_password"] else None,
-            "firstname": file["firstname"] if file["firstname"] else None,
-            "lastname": file["lastname"] if file["lastname"] else None,
-            "patronymic": file["patronymic"] if file["patronymic"] else None,
-            "number_phone": file["number_phone"] if file["number_phone"] else None,
-            "role": 2
+            "email": file.get("email"),
+            "password": file.get("password"),
+            "confirm_password": file.get("confirm_password"),
+            "firstname": file.get("firstname"),
+            "lastname": file.get("lastname"),
+            "patronymic": file.get("patronymic"),
+            "number_phone": file.get("number_phone"),
+            "role": 2 if is_farmer else 1,
+            "inn": file.get("farmerData").get("inn"),
+            "country": file.get("farmerData").get("addressData").get("country"),
+            "city": file.get("farmerData").get("addressData").get("city"),
+            "address": file.get("farmerData").get("addressData").get("address"),
+            "lat": file.get("farmerData").get("addressData").get("lat"),
+            "lng": file.get("farmerData").get("addressData").get("lng"),
         }
+        # Проверка полей фермера
+        if is_farmer:
+            for col in ["inn", "country", "city", "address", "lat", "lng"]:
+                if col == None:
+                    vozvrat["messageError"] = "Не заполненны обязательные поля для фермера"
+                    return jsonify(vozvrat)
+
         # Проверка введённых данных
         valid = valid_data(user)
         if valid != True:
@@ -50,6 +64,7 @@ def registration():
             vozvrat["messageSuccess"] = "Пользователь зарегестрирован"
         else:
             vozvrat["messageError"] = result
+
     else:
         vozvrat["messageError"] = "JSON отсутсвует"
     return jsonify(vozvrat)
@@ -58,10 +73,15 @@ def registration():
 def execute_to_base(database, user):
     values_data = {}
     columns = {}
+    values_data_adress = {}
+    columns_address = {}
     for col in user:
-        if col != "confirm_password":
+        if not col in ["confirm_password", "country", "city", "address", "lat","lng"]:
             columns[col] = sql.Identifier(col)
             values_data[col] = sql.Literal(user[col])
+        elif not col in ["confirm_password"]: 
+            columns_address[col] = sql.Identifier(col)
+            values_data_adress[col] = sql.Literal(user[col])
 
     query = sql.SQL("INSERT INTO {table}({column}) VALUES({value})").format(
         table=sql.Identifier("public", "users"),
@@ -71,7 +91,19 @@ def execute_to_base(database, user):
             values_data[val] for val in values_data),
     )
     vozvrat = database.insert_data(query)
-
+    if vozvrat != True:
+        return vozvrat
+    
+    if user["role"] == 1:
+        query_address = sql.SQL("INSERT INTO {table}({column}) VALUES({value})").format(
+            table=sql.Identifier("public", "address"),
+            column=sql.SQL(',').join(
+                columns_address[col] for col in columns_address),
+            value=sql.SQL(',').join(
+                values_data_adress[val] for val in values_data_adress),
+        )
+        vozvrat = database.insert_data(query_address)
+    database.close()
     return vozvrat
 
 
