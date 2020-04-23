@@ -4,7 +4,6 @@ from flask import Flask
 from flask_wtf.csrf import CsrfProtect, CSRFError
 from flask_sslify import SSLify
 from flask_cors import CORS
-
 from app.router import routers, csrf_exempt
 from app.models import config_init, config
 
@@ -37,6 +36,7 @@ path = os.environ.get('CONFIG_PATH') if os.environ.get(
 config_init(path)
 try:
     #   Flask application configuration
+
     app.config.update(dict(
         SECRET_KEY=str(config['FLASK_APP']['SECRET_KEY']),
         WTF_CSRF_SECRET_KEY=str(config['FLASK_APP']['WTF_CSRF_SECRET_KEY'])

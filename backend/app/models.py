@@ -19,7 +19,8 @@ PERMISSION_AUTHORIZATION = {
     # 1 - Farmer
     # 2 - User
     "api": [0, 1, 2],
-    "logout": [0, 1, 2]
+    "logout": [0, 1, 2],
+    "personal_area": [0, 1, 2]
 }
 
 
