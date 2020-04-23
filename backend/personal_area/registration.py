@@ -26,7 +26,7 @@ def registration():
 
     file = request.get_json(silent=True)
     if file != None and request.method == "POST":
-        is_farmer = file["farmer"] if file["farmer"] else False
+        is_farmer = True if file["farmer"] == True else False
         user = {
             "email": file.get("email"),
             "password": file.get("password"),
@@ -35,13 +35,13 @@ def registration():
             "lastname": file.get("lastname"),
             "patronymic": file.get("patronymic"),
             "number_phone": file.get("number_phone"),
-            "role": 2 if is_farmer else 1,
-            "inn": file.get("farmerData").get("inn"),
-            "country": file.get("farmerData").get("addressData").get("country"),
-            "city": file.get("farmerData").get("addressData").get("city"),
-            "address": file.get("farmerData").get("addressData").get("address"),
-            "lat": file.get("farmerData").get("addressData").get("lat"),
-            "lng": file.get("farmerData").get("addressData").get("lng"),
+            "role": 1 if is_farmer else 2,
+            "inn": file.get("farmerData").get("inn") if is_farmer else None,
+            "country": file.get("farmerData").get("addressData").get("country") if is_farmer else None,
+            "city": file.get("farmerData").get("addressData").get("city") if is_farmer else None,
+            "address": file.get("farmerData").get("addressData").get("address") if is_farmer else None,
+            "lat": file.get("farmerData").get("addressData").get("lat") if is_farmer else None,
+            "lng": file.get("farmerData").get("addressData").get("lng") if is_farmer else None,
         }
         # Проверка полей фермера
         if is_farmer:
@@ -76,10 +76,10 @@ def execute_to_base(database, user):
     values_data_adress = {}
     columns_address = {}
     for col in user:
-        if not col in ["confirm_password", "country", "city", "address", "lat","lng"]:
+        if not col in ["confirm_password", "country", "city", "address", "lat", "lng"]:
             columns[col] = sql.Identifier(col)
             values_data[col] = sql.Literal(user[col])
-        elif not col in ["confirm_password"]: 
+        elif not col in ["confirm_password"]:
             columns_address[col] = sql.Identifier(col)
             values_data_adress[col] = sql.Literal(user[col])
 
@@ -93,7 +93,7 @@ def execute_to_base(database, user):
     vozvrat = database.insert_data(query)
     if vozvrat != True:
         return vozvrat
-    
+
     if user["role"] == 1:
         query_address = sql.SQL("INSERT INTO {table}({column}) VALUES({value})").format(
             table=sql.Identifier("public", "address"),
