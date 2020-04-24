@@ -18,9 +18,12 @@ PERMISSION_AUTHORIZATION = {
     # 0 - Admin
     # 1 - Farmer
     # 2 - User
-    "api": [0, 1, 2],
     "logout": [0, 1, 2],
-    "personal_area": [0, 1, 2]
+    "personal_area": [0, 1, 2],
+    "favorit_product": [0, 1, 2],
+    "get_label": [0, 1, 2],
+    "add_grow": [0, 1, 2],
+    "cart": [0, 1, 2]
 }
 
 
