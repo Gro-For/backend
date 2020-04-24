@@ -26,13 +26,6 @@ CREATE TABLE public.users
 
 INSERT INTO public.users(email, password, intresting, role) VALUES('Admin', 'sha256$9Q6NrDfi$b836d54af9e7a7066fbf0df78ae4f3a18db8cf3013994f557775971e0be718e4', 'Pas$word1', 0);
 
-CREATE TABLE products(
-    id SERIAL PRIMARY KEY,
-    method TEXT,
-    name TEXT,
-    type TEXT
-);
-
 CREATE TABLE currencys(
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE,
@@ -44,14 +37,17 @@ CREATE TABLE units(
     name TEXT UNIQUE
 );
 
-CREATE TABLE users_poduct(
+CREATE TABLE users_product(
     id SERIAL PRIMARY KEY,
     user_id bigint REFERENCES public.users(id) ON DELETE CASCADE,
-    product_id bigint REFERENCES public.products(id) ON DELETE CASCADE,
+    method TEXT,
+    name TEXT,
+    type TEXT,
     photo TEXT,
     price int,
-    currency_id int REFERENCES public.currencys(id),
+    currency_id bigint REFERENCES public.currencys(id),
     weight float,
+    address_id bigint REFERENCES public.address(id),
     unit_id int REFERENCES public.units(id),
     sale int -- Скидка
 );
@@ -65,4 +61,20 @@ CREATE TABLE address(
     lat FLOAT,
     lng FLOAT,
     UNIQUE(user_id, address)
+);
+
+CREATE TABLE favorit_products(
+    id SERIAL PRIMARY KEY,
+    user_id bigint REFERENCES public.users(id) ON DELETE CASCADE,
+    users_product_id bigint REFERENCES public.users_product(id) ON DELETE CASCADE,
+    UNIQUE(user_id, users_product_id)
+);
+
+CREATE TABLE cart(
+    id SERIAL PRIMARY KEY,
+    user_id bigint REFERENCES public.users(id) ON DELETE CASCADE,
+    users_product_id bigint REFERENCES public.users_product(id) ON DELETE CASCADE,
+    weight float,
+    add_time TIMESTAMP WITHOUT TIME ZONE,
+    UNIQUE(user_id, users_product_id)
 );
