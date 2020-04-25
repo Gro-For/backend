@@ -1,1 +1,1 @@
-web: docker-compose up -d --build $PORT
+web: python3 backend/main.py $PORT
