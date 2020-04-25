@@ -7,7 +7,7 @@ from personal_area.logout import logout_bp
 from personal_area.registration import registration_bp
 from personal_area.personal_area import personal_area_bp
 from personal_area.cart import cart_bp
-from personal_area.cart import order_bp
+from personal_area.order import order_bp
 
 
 def routers(app):
