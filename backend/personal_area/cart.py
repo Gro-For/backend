@@ -35,10 +35,11 @@ def cart():
             "up.id",
             "up.name",
             "up.photo",
-            "up.sale",
+            "c.sale",
             "up.weight",
-            "c.weight",
-            "up.price",
+            "c.weight_user",
+            "c.price_for_user",
+            "c.farmer_price",
             "c2.name",
             "u.name"
         ]
@@ -70,9 +71,6 @@ def cart():
         vozvrat = []
         data_append = {}
         for row in execute:
-            price = None
-            weight_farmer = None
-            weight_user = None
             for i in range(len(fields)):
                 value = row[i]
                 if fields[i] == "up.id":
@@ -83,15 +81,6 @@ def cart():
                     fields[i] = "u.unit"
                 elif fields[i] == "up.weight":
                     fields[i] = "up.weight_farmer"
-                    weight_farmer = value
-                elif fields[i] == "c.weight":
-                    fields[i] = "up.weight_user"
-                    weight_user = value
-                elif fields[i] == "up.price":
-                    fields[i] = "up.price_farmer"
-                    data_append[fields[i].split('.')[1]] = value
-                    fields[i] = "up.price_for_user"
-                    value = (value / weight_farmer) * weight_user
 
                 data_append[fields[i].split('.')[1]] = value
             vozvrat.append(data_append)
@@ -139,16 +128,59 @@ def cart():
         return jsonify({'messageError': "Товар отсутствует в корзине"})
 
     if request.method == 'POST' and len(execute) == 0:
-        data_cart["weight"] = float(file.get("weight"))
-        if data_cart["weight"] == None:
+        data_cart["weight_user"] = float(file.get("weight"))
+        if data_cart["weight_user"] == None:
             return jsonify({'messageError': "Укажите вес товара"})
 
-        query = sql.SQL("INSERT INTO {table}(add_time, {column}) VALUES(now(), {value})").format(
+        fields = [
+            "weight",
+            "sale",
+            "price",
+            "currency_id",
+            "unit_id"
+        ]
+
+        query = sql.SQL("\
+        SELECT\
+            {column}\
+        FROM public.users_product\
+        WHERE {condition}").format(
+
+            column=sql.SQL(',').join(
+                sql.SQL(i) for i in fields),
+            condition=sql.SQL('id={users_product_id}').format(
+                users_product_id=sql.Literal(data_cart['users_product_id'])
+            )
+        )
+
+        execute = database.select_data(query)
+
+        if type(execute) != list:
+            return jsonify(execute)
+
+        if len(execute) == 0:
+            return jsonify({'messageError': "Такого товара не существует"})
+
+        execute = execute[0]
+
+        data_cart["user_id"] = user.get_id()
+        data_cart["farmer_price"] = float(execute[2])
+        weight_farmer = float(execute[0])
+        data_cart["sale"] = int(execute[1])
+        data_cart["price_for_user"] = float(
+            "{:.2f}".format(
+                (data_cart['farmer_price'] / weight_farmer) *
+                data_cart['weight_user'] * (1 + data_cart["sale"] / 100)
+            )
+        )
+
+        list_value = [i[1] for i in data_cart.items()]
+
+        query = sql.SQL("INSERT INTO {table}(adding_time, {column}) VALUES(now(), {value})").format(
             table=sql.Identifier("public", "cart"),
             column=sql.SQL(',').join(
-                sql.Identifier(i) for i in ["user_id", "users_product_id", "weight"]),
-            value=sql.SQL(',').join(sql.Literal(i)
-                                    for i in [user.get_id(), data_cart['users_product_id'], data_cart["weight"]])
+                sql.Identifier(i) for i in data_cart),
+            value=sql.SQL(',').join(sql.Literal(i) for i in list_value)
         )
 
         execute = database.insert_data(query)

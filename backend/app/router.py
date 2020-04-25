@@ -7,6 +7,7 @@ from personal_area.logout import logout_bp
 from personal_area.registration import registration_bp
 from personal_area.personal_area import personal_area_bp
 from personal_area.cart import cart_bp
+from personal_area.cart import order_bp
 
 
 def routers(app):
@@ -18,7 +19,7 @@ def routers(app):
     app.register_blueprint(favorit_product_bp)
     app.register_blueprint(get_label_bp)
     app.register_blueprint(cart_bp)
-
+    app.register_blueprint(order_bp)
     return True
 
 
@@ -31,5 +32,5 @@ def csrf_exempt(csrf):
     csrf.exempt(favorit_product_bp)
     csrf.exempt(get_label_bp)
     csrf.exempt(cart_bp)
-
+    csrf.exempt(order_bp)
     return True
