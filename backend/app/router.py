@@ -1,6 +1,7 @@
 from api.add_grow import add_grow_bp
 from api.favorit_product import favorit_product_bp
 from api.get_label import get_label_bp
+from api.check_status import check_status_bp
 
 from personal_area.auth import auth_bp
 from personal_area.logout import logout_bp
@@ -20,6 +21,7 @@ def routers(app):
     app.register_blueprint(get_label_bp)
     app.register_blueprint(cart_bp)
     app.register_blueprint(order_bp)
+    app.register_blueprint(check_status_bp)
     return True
 
 
@@ -33,4 +35,5 @@ def csrf_exempt(csrf):
     csrf.exempt(get_label_bp)
     csrf.exempt(cart_bp)
     csrf.exempt(order_bp)
+    csrf.exempt(check_status_bp)
     return True

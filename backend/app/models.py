@@ -23,7 +23,9 @@ PERMISSION_AUTHORIZATION = {
     "favorit_product": [0, 1, 2],
     "get_label": [0, 1, 2],
     "add_grow": [0, 1, 2],
-    "cart": [0, 1, 2]
+    "cart": [0, 1, 2],
+    "check_status": [0, 1, 2],
+    "order": [0, 1, 2]
 }
 
 
@@ -53,6 +55,10 @@ class User ():
     @classmethod
     def set_user_id(self, id):
         self.__id = id
+
+    @classmethod
+    def get_inn(self):
+        return self.__inn
 
     @classmethod
     def set_email(self, email):

@@ -27,7 +27,7 @@ def add_grow():
 
     # Получение существующих юнитов
     if request.method == 'GET':
-        vozvrat = get_units(database,user.get_id())
+        vozvrat = get_units(database, user.get_id())
         return jsonify(vozvrat)
     # Добавление новой карточки товара
     elif request.method == 'POST':
@@ -60,8 +60,10 @@ def execute_to_base(database, product):
     values_data = {}
     columns = {}
     for col in product:
+        print(col, product[col])
         columns[col] = sql.Identifier(col)
-        values_data[col] = sql.Literal(product[col])
+        values_data[col] = sql.Literal(
+            product[col] if product[col] != '' else None)
 
     query = sql.SQL("INSERT INTO {table}({column}) VALUES({value})").format(
         table=sql.Identifier("public", "users_product"),
@@ -74,7 +76,7 @@ def execute_to_base(database, product):
     return vozvrat
 
 
-def get_units(database,id):
+def get_units(database, id):
     vozvrat = {}
     query = sql.SQL("SELECT * FROM public.currencys")
     vozvrat["currency"] = database.select_data(query)

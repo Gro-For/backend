@@ -11,18 +11,17 @@ SELECT (
 	\echo 'DB schema created'
 \endif
 
--- --Мигарция 1
--- SELECT (select count(*) from public.version)=0 as migrate
--- \gset
--- \if :migrate
--- 	BEGIN;
--- 		--здесь сама миграция
-		
--- 		--обновляем номер версии на следующий
--- 		INSERT INTO public.version(version) VALUES(1);
--- 	COMMIT;
--- 	\echo 'Migration 1 done'
--- \endif
+--Мигарция 1
+SELECT (select count(*) from public.version)=0 as migrate
+\gset
+\if :migrate
+	BEGIN;
+		--здесь сама миграция
+		--обновляем номер версии на следующий
+		INSERT INTO public.version(version) VALUES(1);
+	COMMIT;
+	\echo 'Migration 1 done'
+\endif
 
 -- --Мигарция 2
 -- SELECT (select version from public.version)=1 as migrate 

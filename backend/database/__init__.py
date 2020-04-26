@@ -19,7 +19,8 @@ class Database():
                 user=str(config['POSTGRES']['USER']),
                 password=str(config['POSTGRES']['PASSWORD']),
                 host=str(config['POSTGRES']['HOST']),
-                port=str(config['POSTGRES']['PORT']))
+                port=str(config['POSTGRES']['PORT']),
+                connect_timeout=30)
             conn.autocommit = True
             return conn
         except psycopg2.OperationalError:

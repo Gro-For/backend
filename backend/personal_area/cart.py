@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-from werkzeug.security import generate_password_hash
 from psycopg2 import sql
 
 from app.models import check_auth, authorize, config
